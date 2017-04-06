@@ -34,8 +34,8 @@ install:
     - ${DOCKER_EXEC} /bin/sh -c 'rpm -ivh  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC} /etc/init.d/pbs start
     - ${DOCKER_EXEC} /opt/pbs/bin/qstat --version
-    - ${DOCKER_EXEC} /opt/pbs/bin/qmgr -c "s s managers += `whoami`@*"
-    - ${DOCKER_EXEC} /opt/pbs/bin/qmgr -c "s s acl_roots += `whoami`@*"
+    - ${DOCKER_EXEC} /opt/pbs/bin/qmgr -c "s s managers += testdev@*"
+    - ${DOCKER_EXEC} /opt/pbs/bin/qmgr -c "s s acl_roots += testdev@*"
     - ${DOCKER_EXEC} /opt/pbs/bin/qmgr -c "p s"
     - ${DOCKER_EXEC} /opt/pbs/bin/qsub -- /bin/sleep 1000
     - ${DOCKER_EXEC} /opt/pbs/bin/qsig -s suspend `/opt/pbs/bin/qselect`
