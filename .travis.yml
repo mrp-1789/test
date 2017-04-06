@@ -35,9 +35,10 @@ install:
     - ${DOCKER_EXEC} /bin/sh -c 'rpm -ivh  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC} /etc/init.d/pbs start
+    - ${DOCKER_EXEC} /bin/cat /etc/hosts
+    - ${DOCKER_EXEC} /bin/ps -elf
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat --version
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s managers += root@*"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s acl_roots += root@*"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s scheduling = 1"
@@ -47,7 +48,6 @@ install:
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qrun 0.testdev
     - ${DOCKER_EXEC_TTY} /bin/sleep 3
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsig -s suspend 0.testdev 
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
     - ${DOCKER_EXEC} ./autogen.sh 
     - ${DOCKER_EXEC} ./configure
