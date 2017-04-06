@@ -18,6 +18,7 @@ install:
     - export OS_NAME_VERSION=${OS_NAME// /_}_${OS_VERSION// /_}
     - ${DOCKER_EXEC} zypper -n ar -f -G http://download.opensuse.org/repositories/devel:/tools/${OS_NAME_VERSION}/devel:tools.repo
     - ${DOCKER_EXEC} zypper -n install lynx
+    - ${DOCKER_EXEC} zypper -n install sed
     - ${DOCKER_EXEC} zypper -n install wget
     - ${DOCKER_EXEC} zypper -n install unzip
     - ${DOCKER_EXEC} zypper -n install rpmdevtools
@@ -32,6 +33,7 @@ install:
     - ${DOCKER_EXEC} wget https://raw.githubusercontent.com/PBSPro/pbspro/master/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'rpm -ivh  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
+    - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC} /etc/init.d/pbs start
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat --version
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s managers += root@*"
