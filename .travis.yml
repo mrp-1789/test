@@ -34,12 +34,11 @@ install:
     - ${DOCKER_EXEC} wget https://raw.githubusercontent.com/PBSPro/pbspro/master/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n --no-gpg-checks install  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
-    - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC_TTY} /usr/sbin/iptables -F
     - ${DOCKER_EXEC} /etc/init.d/pbs start
     - ${DOCKER_EXEC} /bin/cat /etc/hosts
     - ${DOCKER_EXEC} /bin/cat /etc/pbs.conf
-    - ${DOCKER_EXEC} /bin/cat /var/spool/pbs/mom_priv/config
+    - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "d n @default"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
     - ${DOCKER_EXEC} /etc/init.d/pbs restart
@@ -53,6 +52,7 @@ install:
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s acl_roots += root@*"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s scheduling = 1"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "p s"
+    - ${DOCKER_EXEC} /bin/cat /var/spool/pbs/mom_priv/config
     - ${DOCKER_EXEC_TTY} /bin/cat /etc/pbs.conf
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsub -- /bin/sleep 1000
     - ${DOCKER_EXEC_TTY} /bin/sleep 3
