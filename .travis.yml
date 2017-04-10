@@ -26,6 +26,7 @@ install:
     - ${DOCKER_EXEC} zypper -n install sendmail
     - ${DOCKER_EXEC} zypper -n install gcc-c++
     - ${DOCKER_EXEC} zypper -n install cppunit-devel
+    - ${DOCKER_EXEC} zypper -n install iptables 
     - ${DOCKER_EXEC} lynx -dump http://pbspro.org/Download.aspx | awk '/http/{print $2}' | grep openSUSE_13.2.zip > link
     - ${DOCKER_EXEC} wget `cat link`
     - ${DOCKER_EXEC} unzip openSUSE_13.2.zip
@@ -34,6 +35,7 @@ install:
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n --no-gpg-checks install  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
+    - ${DOCKER_EXEC_TTY} /usr/sbin/iptables -F
     - ${DOCKER_EXEC} /etc/init.d/pbs start
     - ${DOCKER_EXEC} /bin/cat /etc/hosts
     - ${DOCKER_EXEC} /bin/cat /etc/pbs.conf
