@@ -35,7 +35,7 @@ install:
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n --no-gpg-checks install  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
-    - ${DOCKER_EXEC} /bin/iptables -f
+    - ${DOCKER_EXEC} /bin/iptables -F
     - ${DOCKER_EXEC} /etc/init.d/pbs start
     - ${DOCKER_EXEC} /bin/cat /etc/hosts
     - ${DOCKER_EXEC} /etc/init.d/pbs restart
