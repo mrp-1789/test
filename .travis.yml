@@ -31,8 +31,7 @@ install:
     - ${DOCKER_EXEC} wget `cat link`
     - ${DOCKER_EXEC} unzip openSUSE_13.2.zip
     - ${DOCKER_EXEC} rpm -qlpv openSUSE_13.2/pbspro-14.1.0-13.1.src.rpm
-    - ${DOCKER_EXEC} /bin/ls openSUSE_13.2/
-    - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q openSUSE_13.2/pbspro.spec)"
+    - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n --no-gpg-checks install  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC_TTY} /usr/sbin/iptables -F
     - ${DOCKER_EXEC} /etc/init.d/pbs start
