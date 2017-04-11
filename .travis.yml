@@ -28,21 +28,8 @@ install:
     - ${DOCKER_EXEC} /bin/sh -c 'cp -fv pbspro/pbspro-*.tar.gz /root/rpmbuild/SOURCES/'
     - ${DOCKER_EXEC} rpmbuild -bb pbspro/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n install /root/rpmbuild/RPMS/x86_64/pbspro-server-*.x86_64.rpm'
-    - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
-    - ${DOCKER_EXEC} /etc/init.d/pbs start
-    - ${DOCKER_EXEC} /bin/sh -c 'echo "\$logevent 0xffffffff" >> /var/spool/pbs/mom_priv/config'
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/mom_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/server_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/comm_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC} /etc/init.d/pbs restart
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s managers += root@*"
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s acl_roots += root@*"
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s scheduling = 1"
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "p s"
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsub -- /bin/sleep 1000
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
-    - ${DOCKER_EXEC_TTY} /bin/sleep 10
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsig -s suspend `${DOCKER_EXEC_TTY} /opt/pbs/bin/qselect`
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
+    - ${DOCKER_EXEC} zypper -n install python-pip sudo which net-tools
+    - ${DOCKER_EXEC} /bin/sh -c "cd pbspro/test/fw; pip install -r requirements.txt ."
+    - ${DOCKER_EXEC_TTY} pbs_config --make-ug
+    - ${DOCKER_EXEC_TTY} /bin/sh -c "cd pbspro/test/tests; pbs_benchpress -l INFOCLI2 -o ../../ptl.txt --tags=smoke"
 script: true
