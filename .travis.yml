@@ -23,15 +23,12 @@ install:
     - ${DOCKER_EXEC} rpmdev-setuptree
     - ${DOCKER_EXEC} zypper -n install git 
     - ${DOCKER_EXEC_TTY} git clone https://github.com/PBSPro/pbspro.git 
-    - ${DOCKER_EXEC} /bin/ls
-    - ${DOCKER_EXEC} /bin/cd pbspro
-    - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
-    - ${DOCKER_EXEC} ./autogen.sh
-    - ${DOCKER_EXEC} ./configure
-    - ${DOCKER_EXEC} ./make dist
-    - ${DOCKER_EXEC} /bin/sh -c 'cp -fv pbspro-*.tar.gz /root/rpmbuild/SOURCES/'
-    - ${DOCKER_EXEC} rpmbuild -bb pbspro.spec
+    - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro/pbspro.spec)"
+    - ${DOCKER_EXEC} ./pbspro/autogen.sh
+    - ${DOCKER_EXEC} ./pbspro/configure
+    - ${DOCKER_EXEC} ./pbspro/make dist
+    - ${DOCKER_EXEC} /bin/sh -c 'cp -fv pbspro/pbspro-*.tar.gz /root/rpmbuild/SOURCES/'
+    - ${DOCKER_EXEC} rpmbuild -bb pbspro/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n install /root/rpmbuild/RPMS/x86_64/pbspro-server-*.x86_64.rpm'
-    - ${DOCKER_EXEC} /bin/cd ..
     - ${DOCKER_EXEC} /etc/init.d/pbs start
 script: true
