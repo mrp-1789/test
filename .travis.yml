@@ -37,8 +37,11 @@ install:
     - ${DOCKER_EXEC} /bin/cat /etc/hosts
     - ${DOCKER_EXEC} /bin/cat /etc/pbs.conf
     - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s log_events=2047"
     - ${DOCKER_EXEC} /etc/init.d/pbs restart
     - ${DOCKER_EXEC} /bin/ps -elf
+    - ${DOCKER_EXEC} /bin/echo "\$logevent 0xffffffff" >> /var/spool/pbs/mom_priv/config
+    - ${DOCKER_EXEC} /etc/init.d/pbs restart
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat --version
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
