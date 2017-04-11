@@ -51,6 +51,9 @@ install:
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
     - ${DOCKER_EXEC_TTY} /bin/sleep 10
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
+    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/mom_logs -type f -exec cat {} +
+    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/server_logs -type f -exec cat {} +
+    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/comm_logs -type f -exec cat {} +
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsig -s suspend `${DOCKER_EXEC_TTY} /opt/pbs/bin/qselect`
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
 script: true
