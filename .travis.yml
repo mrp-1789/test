@@ -40,7 +40,6 @@ install:
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s log_events=2047"
     - ${DOCKER_EXEC} /etc/init.d/pbs restart
     - ${DOCKER_EXEC} /bin/ps -elf
-    - ${DOCKER_EXEC} /bin/echo "\$logevent 0xffffffff" >> /var/spool/pbs/mom_priv/config
     - ${DOCKER_EXEC} /etc/init.d/pbs restart
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat --version
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
