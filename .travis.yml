@@ -24,11 +24,18 @@ install:
     - ${DOCKER_EXEC} zypper -n install git 
     - ${DOCKER_EXEC_TTY} git clone https://github.com/PBSPro/pbspro.git 
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro/pbspro.spec)"
-    - ${DOCKER_EXEC} ./pbspro/autogen.sh
-    - ${DOCKER_EXEC} ./pbspro/configure
-    - ${DOCKER_EXEC} ./pbspro/make dist
+    - ${DOCKER_EXEC} /bin/sh -c "cd pbspro;./autogen.sh;./configure;make dist;"
     - ${DOCKER_EXEC} /bin/sh -c 'cp -fv pbspro/pbspro-*.tar.gz /root/rpmbuild/SOURCES/'
     - ${DOCKER_EXEC} rpmbuild -bb pbspro/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n install /root/rpmbuild/RPMS/x86_64/pbspro-server-*.x86_64.rpm'
+    - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC} /etc/init.d/pbs start
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s managers += root@*"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s acl_roots += root@*"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s scheduling = 1"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "p s"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsub -- /bin/sleep 1000
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsig -s suspend `${DOCKER_EXEC_TTY} /opt/pbs/bin/qselect`
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
 script: true
