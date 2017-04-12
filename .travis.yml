@@ -43,7 +43,7 @@ install:
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "d n @default"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
-    - ${DOCKER_EXEC} /bin/sh -c 'while true;do state=`/opt/pbs/bin/pbsnodes -av | grep state | awk '{print $3}'`; if [ $state = "free" ]; then break; else echo $state; sleep 1; fi; done'
+    - ${DOCKER_EXEC} /bin/sh -c 'while true;do state=`/opt/pbs/bin/pbsnodes -av | grep state | cut -d'=' -f2`; if [ $state = "free" ]; then break; else echo $state; sleep 1; fi; done'
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsub -- /bin/sleep 1000
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
