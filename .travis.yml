@@ -5,12 +5,12 @@ services:
 before_install:
     - .github/runchecks
     - docker pull opensuse
-    - docker run -it -d -h testdev.pbspro.com --name testdev -v `pwd`:`pwd` --privileged -w `pwd` opensuse /bin/sh
+    - docker run -it -d -h testdrmaa.pbspro.com --name testdrmaa -v `pwd`:`pwd` --privileged -w `pwd` opensuse /bin/sh
     - docker ps -a
-    - export DOCKER_EXEC_TTY="docker exec -it testdev"
-    - export DOCKER_EXEC="docker exec -i testdev"
-    - export DOCKER_TESTDEV_IP="$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' testdev)"
-    - ${DOCKER_EXEC} /bin/sh -c "echo '${DOCKER_TESTDEV_IP}     testdev' >> /etc/hosts"
+    - export DOCKER_EXEC_TTY="docker exec -it testdrmaa"
+    - export DOCKER_EXEC="docker exec -i testdrmaa"
+    - export DOCKER_TESTDEV_IP="$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' testdrmaa)"
+    - ${DOCKER_EXEC} /bin/sh -c "echo '${DOCKER_TESTDEV_IP}     testdrmaa' >> /etc/hosts"
     - ${DOCKER_EXEC} cat /etc/hosts
 install:
     - export OS_NAME=$(${DOCKER_EXEC} cat /etc/os-release | awk -F[=\"] '/^NAME=/ {print $3}')
@@ -18,7 +18,6 @@ install:
     - export OS_NAME_VERSION=${OS_NAME// /_}_${OS_VERSION// /_}
     - ${DOCKER_EXEC} zypper -n ar -f -G http://download.opensuse.org/repositories/devel:/tools/${OS_NAME_VERSION}/devel:tools.repo
     - ${DOCKER_EXEC} zypper -n install lynx
-    - ${DOCKER_EXEC} zypper -n install sed
     - ${DOCKER_EXEC} zypper -n install wget
     - ${DOCKER_EXEC} zypper -n install unzip
     - ${DOCKER_EXEC} zypper -n install rpmdevtools
@@ -29,31 +28,27 @@ install:
     - ${DOCKER_EXEC} lynx -dump http://pbspro.org/Download.aspx | awk '/http/{print $2}' | grep openSUSE_13.2.zip > link
     - ${DOCKER_EXEC} wget `cat link`
     - ${DOCKER_EXEC} unzip openSUSE_13.2.zip
-    - ${DOCKER_EXEC} rpm -qlpv openSUSE_13.2/pbspro-14.1.0-13.1.src.rpm
+    - ${DOCKER_EXEC} zypper -n ref
+    - ${DOCKER_EXEC} wget https://raw.githubusercontent.com/PBSPro/pbspro/master/pbspro.spec
     - ${DOCKER_EXEC} /bin/sh -c "zypper -n install \$(rpmspec --buildrequires -q pbspro.spec)"
     - ${DOCKER_EXEC} /bin/sh -c 'zypper -n --no-gpg-checks install  openSUSE_13.2/pbspro-server-14.1.0-13.1.x86_64.rpm'
     - ${DOCKER_EXEC} /bin/sed -i.bak 's/^\(PBS_START_MOM=\).*/\11/' /etc/pbs.conf
     - ${DOCKER_EXEC} /opt/pbs/libexec/pbs_init.d start
     - ${DOCKER_EXEC} /bin/sh -c '/bin/echo "\$logevent 0xffffffff" >> /var/spool/pbs/mom_priv/config'
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s log_events=2047"
     - ${DOCKER_EXEC} /opt/pbs/libexec/pbs_init.d restart
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s managers += root@*"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s acl_roots += root@*"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s scheduling = 1"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "s s job_history_enable = 1"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "p s"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "d n @default"
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdev"
+    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qmgr -c "c n testdrmaa"
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
     - ${DOCKER_EXEC} /bin/sh -c 'while true;do state=`/opt/pbs/bin/pbsnodes -av | grep state | cut -d'=' -f2`; if [ $state = "free" ]; then break; else echo $state; sleep 1; fi; done'
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsub -- /bin/sleep 1000
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/pbsnodes -av
     - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/mom_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/server_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC_TTY} find /var/spool/pbs/comm_logs -type f -exec cat {} +
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qsig -s suspend 0.testdev 
-    - ${DOCKER_EXEC_TTY} /opt/pbs/bin/qstat
-    - ${DOCKER_EXEC} ./autogen.sh 
+    - ${DOCKER_EXEC} ./autogen.sh
     - ${DOCKER_EXEC} ./configure
     - ${DOCKER_EXEC} make
-    - ${DOCKER_EXEC} ./test/unittesting/src/test_drmaa 
+    - ${DOCKER_EXEC_TTY} ./test/unittesting/src/test_drmaa
 script: true
